@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+	<style>
+        table{border:2px solid gray;text-align:center;}
+		tr,th,td{border:1px solid silver;padding:3px;}
+		#btn2{margin-left:150px;}
+		#outerDiv{display:flex;}
+		#optionSelect{width:190px};
+    </style>
+    
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+	</script>
+
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+				$.ajax({
+					url:"Servlet16",
+					error : function() {alert("Error");},
+					success : function(dateTimeBooks, status) {
+						//dateTimeBooks[0]["readDateTime"]  //will give the vakue
+						//document.getElementById("showDateAndTime").innerHTML =JSON.stringify(dateTimeBooks);
+						var selFirst = document.getElementById("selectFirst");
+						var selSecond = document.getElementById("selectSecond");
+					
+						for (var i = 0; i < dateTimeBooks.length; i++) {
+							var optn1 = document.createElement('option');
+							optn1.appendChild(document.createTextNode(dateTimeBooks[i]["readDateTime"]));
+							//optn1.value = dateTimeBooks[i]["readDateTime"];
+							selSecond.appendChild(optn1);
+						
+							var optn2 = document.createElement('option');
+							optn2.appendChild(document.createTextNode(dateTimeBooks[i]["readDateTime"]));
+							//optn2.value = dateTimeBooks[i]["readDateTime"];
+							selFirst.appendChild(optn2);
+				        } 
+					}
+				});
+			
+			$('button').click(function() {
+				
+				var e1 = document.getElementById("selectFirst");
+				startDT = e1.options[e1.selectedIndex].value;
+				var e2 = document.getElementById("selectSecond");
+				endDT = e2.options[e2.selectedIndex].value;
+				//alert(startDT);
+				//alert(endDT);
+				
+				// swapping if required 
+				if(startDT>endDT){
+					var temp=startDT;
+					startDT=endDT;
+					endDT=temp;
+				}
+				
+				$.ajax({
+					url : 'Servlet15',
+					data :{
+    					startDateAndTime:startDT,
+    					endDateAndTime:endDT
+    				},
+		            error : function() {alert("Error");},
+					success : function(myBooks, status) {
+						
+//  						console.log(myBooks);
+//  						var myJSON = JSON.stringify(myBooks);
+//  						alert(myBooks.length);
+// 							alert(typeof myBooks);
+// 							document.getElementById("spanId").innerHTML =JSON.stringify(myBooks);
+//							document.getElementById("spanId").innerHTML =myBooks[0]["ramUsed"];  //13.37
+//							document.getElementById("spanId").innerHTML =myBooks[0]["ramUsed"]+" "+myBooks[0]["diskUsed"];  // 13.37 40.55
+
+							var col = ["readDateTime","ramUsed","diskUsed","cpuUsed"];
+							
+							/* var col=[];
+					         for (var i = 0; i < myBooks.length; i++) {
+					            for (var key in myBooks[i]) {
+					                if (col.indexOf(key) === -1) {
+					                    col.push(key);  
+					                }
+					            }
+					         }*/
+
+					        var table = document.createElement("table");
+					        var tr = table.insertRow();                   
+					        for (var i = 0; i < col.length; i++) {
+					            var th = document.createElement("th");      
+					            th.innerHTML = col[i];
+					            tr.appendChild(th);
+					        }
+
+					        for (var i = 0; i < myBooks.length; i++) {
+					            tr = table.insertRow();
+					            for (var j = 0; j < col.length; j++) {
+					                var tabCell = tr.insertCell();
+					                tabCell.innerHTML = myBooks[i][col[j]]; // myBooks[0]["ramUsed"]
+					            }
+					        }
+
+					        var divContainer = document.getElementById("showData");
+					        divContainer.innerHTML = "";
+					        divContainer.appendChild(table);
+
+					}  //success close
+				});
+			});
+		});
+		
+	</script>
+
+</head>
+<body>
+
+   <div id="outerDiv">
+		<div>
+      		<select id="selectFirst" class="optionSelect"></select>
+    	</div>
+    	<div style="margin-left:10px;">
+      		<select id="selectSecond" class="optionSelect"></select>
+    	</div>
+    </div> <br>
+    
+	<span id="spanId">
+		<button id="btn2">Get Data</button>
+	</span>
+	
+	<p id="showData"></p>
+
+</body>
+</html>
